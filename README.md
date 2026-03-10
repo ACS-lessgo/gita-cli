@@ -1,8 +1,8 @@
-# gita-cli
+# Gita-cli
 
 > Access the timeless wisdom of the **Bhagavad Gita** directly from your terminal.
 
-A fast, beautifully formatted, open-source CLI tool built in Go — inspired by the simplicity of [christ-cli](https://github.com/whoisyurii/christ-cli).
+A fast, beautifully formatted, open-source CLI tool built in Go.
 
 ---
 
