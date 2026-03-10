@@ -22,6 +22,18 @@ gita
 
 ---
 
+### Windows — one-liner (PowerShell)
+
+If windows has blocked remote install just run the below command in powershell fist
+
+```bash
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+```bash
+irm https://raw.githubusercontent.com/ACS-lessgo/gita-cli/main/install.ps1 | iex
+```
+
 ### Windows — manual install
 
 1. Go to the [Releases page](https://github.com/ACS-lessgo/gita-cli/releases/latest)
