@@ -4,6 +4,17 @@
 
 A fast, beautifully formatted, open-source CLI tool built in Go.
 
+
+## Screenshots
+
+**Splash screen**
+
+![Splash screen](./screenshots/home.png)
+
+**Interactive reader**
+
+![Interactive reader](./screenshots/reader.png)
+
 ---
 
 ## 📦 Installation
