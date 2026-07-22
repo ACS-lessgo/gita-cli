@@ -3,7 +3,7 @@ package gita_test
 import (
 	"testing"
 
-	"github.com/whoisyurii/gita-cli/internal/gita"
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
 )
 
 // testGita returns a minimal in-memory Gita for testing (bypasses embed).

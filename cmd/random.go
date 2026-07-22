@@ -5,7 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/spf13/cobra"
-	"github.com/whoisyurii/gita-cli/internal/gita"
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
 )
 
 var randomCmd = &cobra.Command{

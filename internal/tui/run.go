@@ -5,7 +5,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/whoisyurii/gita-cli/internal/gita"
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
 )
 
 // Run loads data and starts the interactive TUI.

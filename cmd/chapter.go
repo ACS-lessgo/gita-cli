@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/whoisyurii/gita-cli/internal/gita"
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
 )
 
 var chapterCmd = &cobra.Command{

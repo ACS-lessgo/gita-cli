@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/whoisyurii/gita-cli/internal/gita"
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
 )
 
 // ── Enums ─────────────────────────────────────────────────────────────────────

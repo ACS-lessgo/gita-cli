@@ -1,0 +1,20 @@
+# Binaries
+/gita
+gita.exe
+*.exe
+*.dll
+*.so
+*.dylib
+/dist
+
+# Test / coverage
+*.test
+coverage.out
+
+# Env
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

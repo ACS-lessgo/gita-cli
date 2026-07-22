@@ -7,8 +7,8 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-	"github.com/whoisyurii/gita-cli/internal/gita"
-	"github.com/whoisyurii/gita-cli/internal/tui"
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
+	"github.com/ACS-lessgo/gita-cli/internal/tui"
 )
 
 // ── Styles ────────────────────────────────────────────────────────────────────

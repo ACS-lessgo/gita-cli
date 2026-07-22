@@ -1,9 +1,22 @@
 # Gita-cli
 
+[![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go)](https://go.dev/dl/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/ACS-lessgo/gita-cli)](https://github.com/ACS-lessgo/gita-cli/releases/latest)
+
 > Access the timeless wisdom of the **Bhagavad Gita** directly from your terminal.
 
 A fast, beautifully formatted, open-source CLI tool built in Go.
 
+## Contents
+
+- [Screenshots](#screenshots)
+- [Installation](#-installation)
+- [Features](#-features)
+- [Interactive TUI](#️-interactive-tui)
+- [CLI Usage](#-cli-usage)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## Screenshots
 

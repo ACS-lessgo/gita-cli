@@ -1,6 +1,6 @@
 package main
 
-import "github.com/whoisyurii/gita-cli/cmd"
+import "github.com/ACS-lessgo/gita-cli/cmd"
 
 func main() {
 	cmd.Execute()

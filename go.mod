@@ -1,4 +1,4 @@
-module github.com/whoisyurii/gita-cli
+module github.com/ACS-lessgo/gita-cli
 
 go 1.22
 
