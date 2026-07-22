@@ -16,7 +16,7 @@ func testGita() *gita.Gita {
 
 func TestToggleBookmarkAddAndRemove(t *testing.T) {
 	dir := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", dir)
+	setTestConfigDir(t, dir)
 
 	m := New(testGita())
 

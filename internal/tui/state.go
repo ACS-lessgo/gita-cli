@@ -20,8 +20,13 @@ type bookmark struct {
 	SavedAt    time.Time `json:"savedAt"`
 }
 
+// userConfigDir is os.UserConfigDir by default; tests override it directly
+// so sandboxing doesn't depend on OS-specific env var behavior (XDG_CONFIG_HOME
+// is only honored by os.UserConfigDir on Linux, not macOS or Windows).
+var userConfigDir = os.UserConfigDir
+
 func statePath() (string, error) {
-	dir, err := os.UserConfigDir()
+	dir, err := userConfigDir()
 	if err != nil {
 		return "", err
 	}

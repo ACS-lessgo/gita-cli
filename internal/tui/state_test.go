@@ -5,9 +5,22 @@ import (
 	"time"
 )
 
+// setTestConfigDir redirects statePath() to dir for the duration of the
+// test, bypassing os.UserConfigDir(). t.Setenv("XDG_CONFIG_HOME", ...)
+// looks equivalent but only works on Linux — os.UserConfigDir() ignores
+// that var entirely on macOS (always ~/Library/Application Support) and
+// Windows (always %AppData%), so tests using it were silently unsandboxed
+// on those platforms.
+func setTestConfigDir(t *testing.T, dir string) {
+	t.Helper()
+	old := userConfigDir
+	userConfigDir = func() (string, error) { return dir, nil }
+	t.Cleanup(func() { userConfigDir = old })
+}
+
 func TestSaveLoadStateRoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", dir)
+	setTestConfigDir(t, dir)
 
 	want := persistedState{
 		LastChapter: 2,
@@ -37,7 +50,7 @@ func TestSaveLoadStateRoundTrip(t *testing.T) {
 
 func TestLoadStateMissingFileReturnsError(t *testing.T) {
 	dir := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", dir)
+	setTestConfigDir(t, dir)
 
 	got, err := loadState()
 	if err == nil {
