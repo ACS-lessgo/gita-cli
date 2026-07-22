@@ -47,7 +47,7 @@ func (m Model) drawHelp() string {
 	if w > m.width-4 {
 		w = m.width - 4
 	}
-	innerW := w - 2
+	innerW := w - 2 - 4 // border (2) + horizontal padding (2+2)
 
 	colW := innerW / 2
 	if colW < 20 {
@@ -72,9 +72,15 @@ func (m Model) drawHelp() string {
 		lipgloss.NewStyle().Width(colW).Render(cols[1].String()),
 	)
 
+	boxW := colW*2 + 2 + 4 // actual content width + border + padding
+	if boxW > m.width {
+		boxW = m.width
+	}
+
 	box := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(borderCol(true)).
+		Width(boxW).
 		Background(cBgPanel).
 		Padding(1, 2).
 		Render(body)
