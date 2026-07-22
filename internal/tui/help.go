@@ -75,7 +75,6 @@ func (m Model) drawHelp() string {
 	box := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(borderCol(true)).
-		Width(innerW).
 		Background(cBgPanel).
 		Padding(1, 2).
 		Render(body)

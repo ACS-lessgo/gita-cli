@@ -75,11 +75,16 @@ func (m Model) computePaletteResults(query string) []paletteResult {
 
 	var out []paletteResult
 	lower := strings.ToLower(q)
+	// Cap chapter-title matches at half the result budget so a query that
+	// matches many chapter titles (e.g. "yoga") still leaves room for
+	// verse-text matches, keeping suggestions mixed rather than
+	// chapter-only.
+	maxChapterResults := paletteMaxResults / 2
 	for _, ch := range m.g.Chapters {
 		if strings.Contains(strings.ToLower(ch.Title), lower) {
 			out = append(out, paletteResult{kind: "ch", chapterNum: ch.Chapter, label: ch.Title})
-			if len(out) >= paletteMaxResults {
-				return out
+			if len(out) >= maxChapterResults {
+				break
 			}
 		}
 	}
