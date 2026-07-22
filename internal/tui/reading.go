@@ -77,6 +77,9 @@ func (m Model) drawSidebar(outerW, outerH int) string {
 	}
 
 	listH := iH - 2 // header + separator rows
+	if listH < 0 {
+		listH = 0
+	}
 	body := renderList(rows, m.chapterCursor, listH, iW)
 
 	header := colTitleStyle(true).Width(iW).Render(" G I T A")
@@ -113,7 +116,11 @@ func (m Model) drawReadingContent(outerW, outerH int) string {
 	sep := colSepStyle.Width(iW).Render(strings.Repeat("─", iW))
 
 	m.vp.Width = iW
-	m.vp.Height = iH - 2
+	vpH := iH - 2
+	if vpH < 0 {
+		vpH = 0
+	}
+	m.vp.Height = vpH
 	body := header + "\n" + sep + "\n" + m.vp.View()
 
 	return lipgloss.NewStyle().
