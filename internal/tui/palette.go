@@ -41,16 +41,36 @@ func (m Model) computePaletteResults(query string) []paletteResult {
 	}
 
 	if ref, ok := parseChapterVerse(q); ok {
-		if ref.verseNum > 0 {
-			return []paletteResult{{
-				kind: "v", chapterNum: ref.chapterNum, verseNum: ref.verseNum,
-				label: fmt.Sprintf("Jump to %d.%d", ref.chapterNum, ref.verseNum),
-			}}
+		// Validate chapter exists in loaded data
+		var foundChapter *gita.Chapter
+		for i := range m.g.Chapters {
+			if m.g.Chapters[i].Chapter == ref.chapterNum {
+				foundChapter = &m.g.Chapters[i]
+				break
+			}
 		}
-		return []paletteResult{{
-			kind: "ch", chapterNum: ref.chapterNum,
-			label: fmt.Sprintf("Jump to chapter %d", ref.chapterNum),
-		}}
+		// Only return direct-jump result if chapter exists
+		if foundChapter != nil {
+			// If verse specified, also validate it exists in that chapter
+			if ref.verseNum > 0 {
+				for _, v := range foundChapter.Verses {
+					if v.Verse == ref.verseNum {
+						return []paletteResult{{
+							kind: "v", chapterNum: ref.chapterNum, verseNum: ref.verseNum,
+							label: fmt.Sprintf("Jump to %d.%d", ref.chapterNum, ref.verseNum),
+						}}
+					}
+				}
+				// Verse not found, fall through to free-text search
+			} else {
+				// Chapter exists and no verse specified, return chapter jump
+				return []paletteResult{{
+					kind: "ch", chapterNum: ref.chapterNum,
+					label: fmt.Sprintf("Jump to chapter %d", ref.chapterNum),
+				}}
+			}
+		}
+		// If chapter not found or verse not found, fall through to free-text search
 	}
 
 	var out []paletteResult
