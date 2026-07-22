@@ -1,7 +1,9 @@
 name: CI
 on:
+  workflow_dispatch:
   push:
-  pull_request:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
