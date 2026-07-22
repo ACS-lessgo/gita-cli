@@ -6,7 +6,7 @@ gita.exe
 *.so
 *.dylib
 /dist
-
+/docs
 # Test / coverage
 *.test
 coverage.out
