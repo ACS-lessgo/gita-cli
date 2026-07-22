@@ -188,6 +188,10 @@ func (m Model) View() string {
 // ── Key dispatch ───────────────────────────────────────────────────────────
 
 func (m Model) handleKey(km tea.KeyMsg) (tea.Model, tea.Cmd) {
+	if km.String() == "ctrl+c" {
+		m = m.persistState()
+		return m, tea.Quit
+	}
 	if m.overlay == overlayPalette {
 		return m.handlePaletteKey(km)
 	}
@@ -203,7 +207,7 @@ func (m Model) handleKey(km tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 
 	switch km.String() {
-	case "ctrl+c", "q":
+	case "q":
 		m = m.persistState()
 		return m, tea.Quit
 	case "1":
