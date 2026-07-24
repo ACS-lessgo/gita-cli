@@ -109,3 +109,15 @@ func colTitleStyle(active bool) lipgloss.Style {
 var colSepStyle = lipgloss.NewStyle().
 	Background(cBgPanel).
 	Foreground(cDimmer)
+
+// ── Reading screen (borderless) ───────────────────────────────────────────
+
+var (
+	styleDivider   = lipgloss.NewStyle().Foreground(cBorder).Background(cBg)
+	styleMarkBadge = lipgloss.NewStyle().Foreground(cWhite).Bold(true)
+	styleCiteRule  = lipgloss.NewStyle().Foreground(cDimmer)
+	styleCiteText  = lipgloss.NewStyle().Foreground(cMid)
+
+	styleSliderTrack = lipgloss.NewStyle().Foreground(cDim)
+	styleSliderMark  = lipgloss.NewStyle().Foreground(cHot).Bold(true)
+)

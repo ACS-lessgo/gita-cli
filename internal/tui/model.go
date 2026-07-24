@@ -2,12 +2,13 @@ package tui
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
+	"github.com/ACS-lessgo/gita-cli/internal/gita"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/ACS-lessgo/gita-cli/internal/gita"
 )
 
 // ── Screens & overlays ────────────────────────────────────────────────────
@@ -327,11 +328,16 @@ func (m Model) statusRight() string {
 	case screenReading:
 		if ch := m.currentChapter(); ch != nil {
 			if v := m.currentVerse(); v != nil {
-				pct := 0
+				pct := 0.0
 				if m.vpOK {
-					pct = int(m.vp.ScrollPercent() * 100)
+					pct = m.vp.ScrollPercent()
+					if math.IsNaN(pct) || math.IsInf(pct, 0) {
+						pct = 1.0
+					}
 				}
-				return styleSBInfo.Render(fmt.Sprintf(" Ch %d  v%d  %d%% ", ch.Chapter, v.Verse, pct))
+				slider := progressSlider(pct, 22)
+				text := styleSBInfo.Render(fmt.Sprintf(" Ch %d  v%d  %d%% ", ch.Chapter, v.Verse, int(pct*100)))
+				return slider + text
 			}
 		}
 	case screenSearch:
@@ -419,6 +425,32 @@ func repeatStr(s string, n int) []string {
 		out[i] = s
 	}
 	return out
+}
+
+// progressSlider renders a fixed-width "─" track with one bright marker
+// positioned proportionally to pct (0..1).
+func progressSlider(pct float64, width int) string {
+	if width < 3 {
+		width = 3
+	}
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 1 {
+		pct = 1
+	}
+	pos := int(pct * float64(width-1))
+	var b strings.Builder
+	b.WriteString(" ")
+	for i := 0; i < width; i++ {
+		if i == pos {
+			b.WriteString(styleSliderMark.Render("●"))
+		} else {
+			b.WriteString(styleSliderTrack.Render("─"))
+		}
+	}
+	b.WriteString(" ")
+	return b.String()
 }
 
 // wrap word-wraps text to width characters per line.

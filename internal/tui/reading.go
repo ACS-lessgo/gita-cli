@@ -9,12 +9,13 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const sidebarW = 34 // outer width of the chapter sidebar, border included
+const sidebarW = 34 // outer width of the chapter sidebar (no border)
+const maxWrapW = 76 // readable cap on verse body wrap width
 
 func (m Model) readingContentW() int {
 	w := m.width
 	if m.sidebarOpen {
-		w -= sidebarW
+		w -= sidebarW + 1 // +1 for the divider column
 	}
 	if w < 20 {
 		w = 20
@@ -31,17 +32,42 @@ func (m Model) readingBodyH() int {
 }
 
 func (m Model) syncVP() Model {
-	innerH := panelInnerH(m.readingBodyH()) - 2 // minus header + separator rows
-	vpW := panelInnerW(m.readingContentW())
+	outerW := m.readingContentW()
+	vpH := m.readingBodyH() - 2 // minus header + separator rows
+	if vpH < 0 {
+		vpH = 0
+	}
+	vpW := outerW
+
+	wrapW := vpW - 4 // small breathing margin either side of the centered text
+	if wrapW > maxWrapW {
+		wrapW = maxWrapW
+	}
+	if wrapW < 10 {
+		wrapW = 10
+	}
+
 	if !m.vpOK {
-		m.vp = viewport.New(vpW, innerH)
+		m.vp = viewport.New(vpW, vpH)
 		m.vpOK = true
 	} else {
 		m.vp.Width = vpW
-		m.vp.Height = innerH
+		m.vp.Height = vpH
 	}
-	m.vp.SetContent(m.buildContent())
+	m.vp.SetContent(placeVerse(m.verseBlock(wrapW), vpW, vpH))
 	return m
+}
+
+func verticalDivider(h int) string {
+	if h < 1 {
+		h = 1
+	}
+	line := styleDivider.Render("│")
+	lines := make([]string, h)
+	for i := range lines {
+		lines[i] = line
+	}
+	return strings.Join(lines, "\n")
 }
 
 func (m Model) drawReading() string {
@@ -51,12 +77,13 @@ func (m Model) drawReading() string {
 		return content
 	}
 	sidebar := m.drawSidebar(sidebarW, bodyH)
-	return lipgloss.JoinHorizontal(lipgloss.Top, sidebar, content)
+	divider := verticalDivider(bodyH)
+	return lipgloss.JoinHorizontal(lipgloss.Top, sidebar, divider, content)
 }
 
 func (m Model) drawSidebar(outerW, outerH int) string {
-	iW := panelInnerW(outerW)
-	iH := panelInnerH(outerH)
+	iW := outerW
+	iH := outerH
 
 	rows := make([]string, len(m.g.Chapters))
 	for i, ch := range m.g.Chapters {
@@ -87,60 +114,58 @@ func (m Model) drawSidebar(outerW, outerH int) string {
 	inner := header + "\n" + sep + "\n" + body
 
 	return lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder()).
-		BorderForeground(borderCol(true)).
 		Width(iW).Height(iH).
 		Background(cBgPanel).
 		Render(inner)
 }
 
+// headerRow lays out a left-aligned crumb and a right-aligned badge on one
+// colTitleStyle-colored line of width w, gap-filled like drawStatus.
+func headerRow(left, right string, w int) string {
+	lw, rw := lipgloss.Width(left), lipgloss.Width(right)
+	gap := w - lw - rw
+	if gap < 0 {
+		gap = 0
+	}
+	line := left + strings.Repeat(" ", gap) + right
+	return colTitleStyle(true).Width(w).Render(line)
+}
+
 func (m Model) drawReadingContent(outerW, outerH int) string {
-	iW := panelInnerW(outerW)
-	iH := panelInnerH(outerH)
+	iW := outerW
+	iH := outerH
 
 	ch := m.currentChapter()
 	v := m.currentVerse()
 
-	var crumb string
+	var left, rightBadge string
 	if ch != nil && v != nil {
-		mark := ""
+		left = fmt.Sprintf(" %d.%d   %s", ch.Chapter, v.Verse, ch.Title)
 		if m.isBookmarked(ch.Chapter, v.Verse) {
-			mark = "  ◆ marked"
+			rightBadge = styleMarkBadge.Render("◆ marked ")
 		}
-		crumb = fmt.Sprintf(" %d.%d   %s%s", ch.Chapter, v.Verse, ch.Title, mark)
 	} else {
-		crumb = " Select a chapter"
+		left = " Select a chapter"
 	}
 
-	header := colTitleStyle(true).Width(iW).Render(crumb)
+	header := headerRow(left, rightBadge, iW)
 	sep := colSepStyle.Width(iW).Render(strings.Repeat("─", iW))
 
-	m.vp.Width = iW
-	vpH := iH - 2
-	if vpH < 0 {
-		vpH = 0
-	}
-	m.vp.Height = vpH
 	body := header + "\n" + sep + "\n" + m.vp.View()
 
 	return lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder()).
-		BorderForeground(borderCol(true)).
 		Width(iW).Height(iH).
 		Background(cBgPanel).
 		Render(body)
 }
 
-func (m Model) buildContent() string {
+// verseBlock returns the raw (unplaced) styled verse column: chapter head,
+// verse label, wrapped body, and a citation footer.
+func (m Model) verseBlock(wrapW int) string {
 	ch := m.currentChapter()
 	v := m.currentVerse()
 	if ch == nil || v == nil {
 		return styleSep.Render("No verse selected.")
-	}
-
-	wrapW := panelInnerW(m.readingContentW()) - 2
-	if wrapW < 10 {
-		wrapW = 10
 	}
 
 	var b strings.Builder
@@ -149,8 +174,47 @@ func (m Model) buildContent() string {
 	b.WriteString(styleVerseNum.Render(fmt.Sprintf("Verse %d", v.Verse)))
 	b.WriteString("\n\n")
 	b.WriteString(styleVerseBody.Render(wrap(v.Text, wrapW)))
-	b.WriteString("\n")
+	b.WriteString("\n\n")
+	b.WriteString(verseFooter(ch.Chapter, v.Verse))
 	return b.String()
+}
+
+// verseFooter renders a short decorative rule + citation, centered within a
+// fixed footer width (independent of the panel width).
+func verseFooter(chapter, verse int) string {
+	const footerW = 24
+	rule := styleCiteRule.Render(strings.Repeat("─", footerW))
+	cite := styleCiteText.Render(fmt.Sprintf("‖ %d.%d ‖", chapter, verse))
+	return rule + "\n" + lipgloss.PlaceHorizontal(footerW, lipgloss.Center, cite)
+}
+
+// maxTopPad caps how much blank space is inserted above the verse block on
+// tall terminals — full vertical centering left too much empty screen.
+const maxTopPad = 4
+
+// placeVerse centers raw (a verse block) horizontally always, with a small
+// capped top margin (not full vertical centering) when it fits within h;
+// taller content falls back to top alignment so viewport scrolling works.
+func placeVerse(raw string, w, h int) string {
+	centered := lipgloss.PlaceHorizontal(w, lipgloss.Center, raw,
+		lipgloss.WithWhitespaceBackground(cBgPanel))
+
+	lines := strings.Count(raw, "\n") + 1
+	if h <= 0 || lines > h {
+		return centered
+	}
+
+	topPad := (h - lines) / 2
+	if topPad > maxTopPad {
+		topPad = maxTopPad
+	}
+	if topPad <= 0 {
+		return centered
+	}
+
+	blank := lipgloss.NewStyle().Width(w).Background(cBgPanel).Render("")
+	pad := strings.Repeat(blank+"\n", topPad)
+	return pad + centered
 }
 
 func (m Model) handleReadingKey(km tea.KeyMsg) (tea.Model, tea.Cmd) {
