@@ -16,6 +16,7 @@ A fast, beautifully formatted, open-source CLI tool built in Go.
 - [Interactive TUI](#️-interactive-tui)
 - [CLI Usage](#-cli-usage)
 - [Contributing](#-contributing)
+- [Releasing](#-releasing)
 - [License](#-license)
 
 ## Screenshots
@@ -189,6 +190,28 @@ cd gita-cli
 go mod tidy
 go test ./...        # run tests
 go build -o gita .   # build
+```
+
+---
+
+## 🚀 Releasing
+
+Maintainer-only. Pushing a `v*.*.*` tag triggers the [release workflow](.github/workflows/release.yml): it runs `go build`/`go vet`/`go test`, then GoReleaser builds and publishes binaries for Linux/macOS/Windows to the [Releases page](https://github.com/ACS-lessgo/gita-cli/releases).
+
+```bash
+git checkout main
+git pull
+
+# pick the next version (semver: MAJOR.MINOR.PATCH)
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+Watch progress under the repo's **Actions** tab. To fix a bad release, delete the tag locally and remotely, then re-tag:
+
+```bash
+git tag -d v1.2.3
+git push origin :refs/tags/v1.2.3
 ```
 
 ---
